@@ -1,0 +1,12 @@
+<h1>{{.Title}}</h1>
+
+<p>[<a href="/edit/{{.Title}}">edit</a>]</p>
+
+<div>{{printf "%s" .Body}}</div>
+
+
+<form action="/upload/" enctype="multipart/form-data" method="post">
+    <input type="file" name="file" id="file" />
+    <input type="hidden" name="token" value="{{.}}" />
+    <input type="submit" value="upload" />
+</form>

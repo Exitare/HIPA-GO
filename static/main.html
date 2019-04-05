@@ -1,0 +1,7 @@
+<h1>HIPA Web Application</h1>
+
+<form action="/upload/" enctype="multipart/form-data" method="post">
+    <input type="file" name="file" id="file" />
+    <input type="hidden" name="token" value="{{.}}" />
+    <input type="submit" value="upload" />
+</form>
