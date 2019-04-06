@@ -11,7 +11,8 @@ import (
 )
 
 type MainPage struct {
-	Name string
+	FileName string
+	LOC      uint32
 }
 
 func main() {
@@ -22,7 +23,8 @@ func main() {
 func serveMainPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./static/main.html"))
 	data := MainPage{
-		Name: "Raphael",
+		FileName: "",
+		LOC:      0,
 	}
 
 	tmpl.Execute(w, data)
@@ -56,7 +58,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Content Type: %s", handler.Header["Content-Type"])
 
 	contentType := handler.Header["Content-Type"]
-
+	var count uint32
 	if contentType[0] == "text/plain" {
 		fmt.Printf("Content type is txt file.")
 		io.Copy(&Buf, file)
@@ -71,7 +73,6 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 		lines := strings.Split(contents, "\n")
 
-		count := 0
 		for _, element := range lines {
 			count++
 
@@ -83,5 +84,11 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Count is", count)
 	}
 
-	fmt.Fprintf(w, "Successfully Uploaded File\n")
+	tmpl := template.Must(template.ParseFiles("./static/main.html"))
+	data := MainPage{
+		FileName: handler.Filename,
+		LOC:      count,
+	}
+
+	tmpl.Execute(w, data)
 }
