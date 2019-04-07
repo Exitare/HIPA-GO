@@ -6,26 +6,27 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"text/template"
 )
 
 type MainPage struct {
-	FileName string
+}
+
+type ResultPage struct {
+	Name     string
+	fileName string
 	LOC      uint32
 }
 
 func main() {
+
 	setupRoutes()
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func serveMainPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./static/main.html"))
-	data := MainPage{
-		FileName: "",
-		LOC:      0,
-	}
+	data := MainPage{}
 
 	tmpl.Execute(w, data)
 }
@@ -58,37 +59,44 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Content Type: %s", handler.Header["Content-Type"])
 
 	contentType := handler.Header["Content-Type"]
-	var count uint32
+
 	if contentType[0] == "text/plain" {
 		fmt.Printf("Content type is txt file.")
 		io.Copy(&Buf, file)
 		// do something with the contents...
 		// I normally have a struct defined and unmarshal into a struct, but this will
 		// work as an example
-		contents := Buf.String()
-		tests, err := Buf.ReadString('\n')
-		if err == nil {
-			fmt.Println(tests)
+		content := Buf.String()
+
+		inputFile := InputFile{
+			Name:    handler.Filename,
+			Content: content,
 		}
 
-		lines := strings.Split(contents, "\n")
-
-		for _, element := range lines {
-			count++
-
-			fmt.Println(element)
-			// index is the index where we are
-			// element is the element from someSlice for where we are
-		}
-
-		fmt.Println("Count is", count)
+		inputFiles = append(inputFiles, inputFile)
 	}
 
-	tmpl := template.Must(template.ParseFiles("./static/main.html"))
-	data := MainPage{
-		FileName: handler.Filename,
-		LOC:      count,
+	startCalculations()
+	for _, inputFile := range inputFiles {
+		fmt.Println(inputFile.Name)
+		fmt.Printf("Addr: %p\n", &inputFile)
+	}
+
+}
+
+func showResultPage(w http.ResponseWriter) {
+	tmpl := template.Must(template.ParseFiles("./static/result.html"))
+	data := ResultPage{
+		Name:     "Raphael",
+		fileName: "Testpage",
+		LOC:      1500,
 	}
 
 	tmpl.Execute(w, data)
+}
+
+func startCalculations() {
+	for _, inputFile := range inputFiles {
+		inputFile.countLines()
+	}
 }
