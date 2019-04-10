@@ -37,5 +37,4 @@ func (inputFile *InputFile) countLines() {
 func (inputFile *InputFile) cellBuilder() {
 	//lines := strings.Split(inputFile.Content, "\n")
 
-	
 }
