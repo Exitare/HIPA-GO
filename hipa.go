@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"text/template"
+	"os"
 )
 
 type MainPage struct {
@@ -39,48 +39,61 @@ func setupRoutes() {
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("File Upload Endpoint Hit")
-	var Buf bytes.Buffer
+	fmt.Println("ich bin ein Test")
 	// Parse our multipart form, 10 << 20 specifies a maximum
 	// upload of 10 MB files.
-	r.ParseMultipartForm(10 << 20)
-	// FormFile returns the first file for the given key `myFile`
-	// it also returns the FileHeader so we can get the Filename,
-	// the Header and the size of the file
-	file, handler, err := r.FormFile("file")
+	err := r.ParseMultipartForm(32 << 20)
+
 	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
+		fmt.Println("error0")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer file.Close()
-	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-	fmt.Printf("File Size: %+v\n", handler.Size)
-	fmt.Printf("MIME Header: %+v\n", handler.Header)
-	fmt.Printf("Content Type: %s", handler.Header["Content-Type"])
 
-	contentType := handler.Header["Content-Type"]
 
-	if contentType[0] == "text/plain" {
-		fmt.Printf("Content type is txt file.")
-		io.Copy(&Buf, file)
-		// do something with the contents...
-		// I normally have a struct defined and unmarshal into a struct, but this will
-		// work as an example
-		content := Buf.String()
 
-		inputFile := InputFile{
-			Name:    handler.Filename,
-			Content: content,
+	//get a ref to the parsed multipart form
+	m := r.MultipartForm
+
+	//get the *fileheaders
+	files := m.File["files"]
+
+	for i, _ := range files {
+		//for each fileheader, get a handle to the actual file
+		file, err := files[i].Open()
+		defer file.Close()
+		if err != nil {
+			fmt.Println("error1")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-
-		inputFiles = append(inputFiles, inputFile)
+		//create destination file making sure the path is writeable.
+		fmt.Println(files[i].Filename)
+		dst, err := os.Create("./data/" + files[i].Filename)
+		defer dst.Close()
+		if err != nil {
+			fmt.Println("error2")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		//copy the uploaded file to the destination file
+		if _, err := io.Copy(dst, file); err != nil {
+			fmt.Println("error3")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		
 	}
+	fmt.Println("Upload successful.")
+	
 
-	startCalculations()
-	for _, inputFile := range inputFiles {
-		fmt.Println(inputFile.Name)
-		fmt.Printf("Addr: %p\n", &inputFile)
-	}
+
+
+	//startCalculations()
+	//for _, inputFile := range inputFiles {
+	//	fmt.Println(inputFile.Name)
+//		fmt.Printf("Addr: %p\n", &inputFile)
+//	}
 
 }
 
