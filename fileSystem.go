@@ -39,21 +39,19 @@ func createDirectory() (string, error) {
 }
 
 //ParseFiles parse the uploaded files per request
-func ParseFiles(w http.ResponseWriter, r *http.Request) bool {
+func ParseFiles(w http.ResponseWriter, r *http.Request) error {
 
 	// TODO create Folder
 	folderName, err := createDirectory()
 
 	if err != nil {
-		fmt.Println("Could not create directory")
-		return false
+		return err
 	}
 
 	err = r.ParseMultipartForm(32 << 10)
 
 	if err != nil {
-		fmt.Println("Could not parse file")
-		return false
+		return err
 	}
 
 	m := r.MultipartForm
@@ -62,34 +60,34 @@ func ParseFiles(w http.ResponseWriter, r *http.Request) bool {
 
 	for i := range files {
 		file, err := files[i].Open()
-		fmt.Println("Received file: ", files[i].Filename)
+
+		var Cells []Cell
+		inputFile := InputFile{"", "", folderName, 0, 0.0, Cells, 0, 0, 0, 0, 0}
+		inputFiles = append(inputFiles, &inputFile)
+
+		inputFile.resolveName(files[i].Filename)
+
+		fmt.Println("Received file: ", inputFile.Name)
 		defer file.Close()
 
 		if err != nil {
-			fmt.Println("Error while open file")
-			return false
+			return err
 		}
 
-		dst, err := os.Create(workingDir + folderName + "/" + files[i].Filename)
+		dst, err := os.Create(workingDir + folderName + "/" + inputFile.Name + ".txt")
 
 		defer dst.Close()
 
 		if err != nil {
-			fmt.Println("Could not create file")
-			return false
+			return err
 		}
 
 		if _, err := io.Copy(dst, file); err != nil {
-			fmt.Println("Could not copy file")
-			return false
+			return err
 		}
 
-		var Cells []Cell
-		inputFile := InputFile{files[i].Filename, "", folderName, 0, 0.0, Cells, 0, 0, 0, 0, 0}
-
-		inputFiles = append(inputFiles, inputFile)
-		fmt.Printf("Uploaded %s succesfully\n", files[i].Filename)
+		fmt.Printf("Uploaded %s succesfully\n", inputFile.Name)
 
 	}
-	return true
+	return nil
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"strings"
 )
 
@@ -23,34 +22,32 @@ type InputFile struct {
 }
 
 //ReadFile reads the content of a file
-func ReadFile(inputFile *InputFile) {
-	content, err := ioutil.ReadFile("testdata/hello")
+func (inputFile *InputFile) readContent() error {
+	content, err := ioutil.ReadFile(workingDir + inputFile.Foldername + "/" + inputFile.Name + ".txt")
 	if err != nil {
-		log.Fatal(err)
+		return err
+	}
+	inputFile.Content = string(content)
+	return nil
+}
+
+func (inputFile *InputFile) resolveName(uploadName string) {
+	uploadName = strings.Join(strings.Fields(uploadName), "")
+	splits := strings.Split(uploadName, ".")
+
+	for i := 0; i < len(splits)-1; i++ {
+		if i == 0 {
+			inputFile.Name = splits[i]
+		} else {
+			inputFile.Name = inputFile.Name + "_" + splits[i]
+		}
 	}
 
-	fmt.Printf("File contents: %s", content)
-}
-
-func (inputFile *InputFile) showContent() {
-	fmt.Println(inputFile.Content)
-}
-
-func (inputFile *InputFile) getFileName() {
-	splits := strings.Split(inputFile.Name, ".")
-	inputFile.Name = splits[0]
+	fmt.Println(inputFile.Name)
 }
 
 func (inputFile *InputFile) countLines() {
-	var count int
-
-	lines := strings.Split(inputFile.Content, "\n")
-
-	for count < len(lines) {
-		count++
-	}
-
-	fmt.Println("Count is", count)
+	inputFile.Lines = uint32(len(strings.Split(inputFile.Content, "\n")))
 }
 
 func (inputFile *InputFile) cellBuilder() {

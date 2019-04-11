@@ -38,19 +38,36 @@ func setupRoutes() {
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("File Upload Endpoint Hit")
 
-	success := ParseFiles(w, r)
+	err := ParseFiles(w, r)
 
-	if success {
-		prepareFiles()
-		startCalculations()
+	if err != nil {
+		fmt.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
+	err = prepareFiles()
+	if err != nil {
+		fmt.Println(err.Error())
+		http.Error(w, "Error while processing files", http.StatusInternalServerError)
+		return
+	}
+
+	startCalculations()
 }
 
-func prepareFiles() {
+func prepareFiles() error {
 	for _, inputFile := range inputFiles {
-		inputFile.getFileName()
-		fmt.Printf("Filename is %s stored in folder %s\n", inputFile.Name, inputFile.Foldername)
+		err := inputFile.readContent()
+		if err != nil {
+			return err
+		}
+
+		inputFile.countLines()
+		fmt.Println(inputFile.Lines)
 	}
+
+	return nil
 }
 
 func startCalculations() {

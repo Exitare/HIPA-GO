@@ -1,5 +1,6 @@
 package main
 
+//TimeFrame represents a TimeFrame struct
 type TimeFrame struct {
 	ID                      uint32
 	Value                   float64
