@@ -39,8 +39,19 @@ func setupRoutes() {
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("File Upload Endpoint Hit")
+	fmt.Println(r.Header.Get("X-Forwarded-For"))
+	fmt.Println("Client IP is ", r.Header.Get("X-Forwarded-For"))
 
-	err := r.ParseMultipartForm(32 << 10)
+	// TODO create Folder
+	folderName, err := CreateDirectory()
+
+	if err != nil {
+		fmt.Println("Could not create directory")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = r.ParseMultipartForm(32 << 10)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -51,9 +62,9 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 	files := m.File["files"]
 
-	for i, _ := range files {
+	for i := range files {
 		file, err := files[i].Open()
-		fmt.Println(files[i].Filename)
+		fmt.Println("Received file: ", files[i].Filename)
 		defer file.Close()
 
 		if err != nil {
@@ -62,7 +73,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		dst, err := os.Create("./data/" + files[i].Filename)
+		dst, err := os.Create("./data/" + folderName + "/" + files[i].Filename)
 
 		defer dst.Close()
 
