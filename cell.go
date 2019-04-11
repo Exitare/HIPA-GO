@@ -9,3 +9,4 @@ type Cell struct {
 	TimeFrameMaximum     float32
 	HighIntensityCounts  map[float64]int32
 }
+

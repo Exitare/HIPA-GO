@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"os"
 	"text/template"
 )
 
@@ -39,63 +37,22 @@ func setupRoutes() {
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("File Upload Endpoint Hit")
-	fmt.Println(r.Header.Get("X-Forwarded-For"))
-	fmt.Println("Client IP is ", r.Header.Get("X-Forwarded-For"))
 
-	// TODO create Folder
-	folderName, err := CreateDirectory()
+	success := ParseFiles(w, r)
 
-	if err != nil {
-		fmt.Println("Could not create directory")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if success {
+		prepareFiles()
+		startCalculations()
 	}
+}
 
-	err = r.ParseMultipartForm(32 << 10)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	m := r.MultipartForm
-
-	files := m.File["files"]
-
-	for i := range files {
-		file, err := files[i].Open()
-		fmt.Println("Received file: ", files[i].Filename)
-		defer file.Close()
-
-		if err != nil {
-			fmt.Println("Error while open file")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		dst, err := os.Create("./data/" + folderName + "/" + files[i].Filename)
-
-		defer dst.Close()
-
-		if err != nil {
-			fmt.Println("Could not create file")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		if _, err := io.Copy(dst, file); err != nil {
-			fmt.Println("Could not copy file")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		fmt.Println("Upload succesfull")
-
+func prepareFiles() {
+	for _, inputFile := range inputFiles {
+		inputFile.getFileName()
+		fmt.Printf("Filename is %s stored in folder %s\n", inputFile.Name, inputFile.Foldername)
 	}
 }
 
 func startCalculations() {
-	for _, inputFile := range inputFiles {
-		inputFile.countLines()
-	}
+
 }
