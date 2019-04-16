@@ -57,12 +57,13 @@ func ParseFiles(w http.ResponseWriter, r *http.Request) error {
 	m := r.MultipartForm
 
 	files := m.File["files"]
+	fmt.Println(r.Form["new_data"])
 
 	for i := range files {
 		file, err := files[i].Open()
 
-		var Cells []Cell
-		inputFile := InputFile{"", "", folderName, 0, 0.0, Cells, 0, 0, 0, 0, 0}
+		var Cells []*Cell
+		inputFile := InputFile{"", "", folderName, 0.0, Cells, 0, 0, 0, 0, 0}
 		inputFiles = append(inputFiles, &inputFile)
 
 		inputFile.resolveName(files[i].Filename)

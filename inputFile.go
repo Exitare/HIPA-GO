@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"strings"
 )
 
@@ -11,9 +12,8 @@ type InputFile struct {
 	Name                 string
 	Content              string
 	Foldername           string
-	Lines                uint32
 	PercentageLimit      float32
-	Cells                []Cell
+	Cells                []*Cell
 	CellCount            uint64
 	RowCount             uint64
 	TimeFrameCount       uint64
@@ -46,11 +46,53 @@ func (inputFile *InputFile) resolveName(uploadName string) {
 	fmt.Println(inputFile.Name)
 }
 
-func (inputFile *InputFile) countLines() {
-	inputFile.Lines = uint32(len(strings.Split(inputFile.Content, "\n")))
+func (inputFile *InputFile) countTimeFrames() {
+	inputFile.TimeFrameCount = uint64(len(strings.Split(inputFile.Content, "\n"))) - 1
 }
 
-func (inputFile *InputFile) cellBuilder() {
-	//lines := strings.Split(inputFile.Content, "\n")
+func (inputFile *InputFile) countCells() {
+	lines := strings.Split(inputFile.Content, "\n")
+	for line := range lines {
+		strings.Trim(lines[line], " ")
+		fmt.Printf("Line is: %s \n", lines[line])
+		fmt.Printf("Line lengt is %d", len(lines[line]))
+		if len(lines[line]) != 0 || len(lines[line]) != nil {
+			values := strings.Split(lines[line], "\t")
+			count := 0
+			for range values {
+				count++
+			}
+			fmt.Printf("Lenght is: %d \n", count)
+			inputFile.CellCount = uint64(len(values))
+		}
+	}
+}
 
+func (inputFile *InputFile) createCells() {
+	var timeFrames []*TimeFrame
+	var highIntensityCounts map[float64]int32
+	for i := 0; i < int(inputFile.CellCount); i++ {
+		cell := Cell{"", timeFrames, 0.0, 0.0, timeFrames, 0.0, highIntensityCounts}
+		inputFile.Cells = append(inputFile.Cells, &cell)
+	}
+}
+
+func (inputFile *InputFile) populateCells() {
+
+	lines := strings.Split(inputFile.Content, "\n")
+
+	for line := range lines {
+		cellValueList := strings.Split(lines[line], "\t")
+
+		for cell := 0; cell < int(inputFile.CellCount); cell++ {
+			if line == 0 {
+				inputFile.Cells[cell].Name = cellValueList[cell]
+			} else {
+				if timeframeValue, err := strconv.ParseFloat(cellValueList[cell], 32); err == nil {
+					timeframe := TimeFrame{uint32(line), timeframeValue, (float64(line) * 3.9 / 60), false}
+					inputFile.Cells[cell].TimeFrames = append(inputFile.Cells[cell].TimeFrames, &timeframe)
+				}
+			}
+		}
+	}
 }

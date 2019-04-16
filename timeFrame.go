@@ -4,6 +4,6 @@ package main
 type TimeFrame struct {
 	ID                      uint32
 	Value                   float64
-	IncludingMinute         uint32
+	IncludingMinute         float64
 	AboveBelowCellThreshold bool
 }

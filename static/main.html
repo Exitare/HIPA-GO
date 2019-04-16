@@ -1,7 +1,27 @@
-<h1>HIPA Web Application</h1>
+<head>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <title>HIPA On the GO</title>
+</head>
 
-<form action="/upload/" enctype="multipart/form-data" method="post">
-    <input type="file" name="files" id="files" multiple="multiple" />
-    <input type="hidden" name="token" value="{{.}}" />
-    <input type="submit" value="Upload" />
-</form>
+<body>
+    <div class="Headline">
+        <h1>HIPA GO</h1>
+    </div>
+
+    <br>
+    <div>
+        <form action="/upload/" enctype="multipart/form-data" method="post">
+            <p>Seperator:
+                <select id="new_data" name="new_data">
+                    <option value="tab">Tab</option>
+                </select>
+            </p>
+            <input type="file" name="files" id="files" multiple="multiple" />
+            <input type="hidden" name="token" value="{{.}}" />
+            <br>
+            <br>
+            <input type="submit" value="Upload" />
+        </form>
+    </div>
+
+</body>

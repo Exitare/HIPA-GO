@@ -62,9 +62,11 @@ func prepareFiles() error {
 		if err != nil {
 			return err
 		}
-
-		inputFile.countLines()
-		fmt.Println(inputFile.Lines)
+		inputFile.countTimeFrames()
+		inputFile.countCells()
+		inputFile.createCells()
+		inputFile.populateCells()
+		fmt.Println(inputFile.CellCount)
 	}
 
 	return nil
