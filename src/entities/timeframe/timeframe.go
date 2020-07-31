@@ -1,4 +1,4 @@
-package main
+package entities
 
 //TimeFrame represents a TimeFrame struct
 type TimeFrame struct {

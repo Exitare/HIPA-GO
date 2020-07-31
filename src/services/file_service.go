@@ -1,10 +1,12 @@
-package main
+package services
 
 import (
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"entities/cell"
+	"entities/file"
 )
 
 // dirExists returns whether the given file or directory exists
