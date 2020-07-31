@@ -1,10 +1,9 @@
-package FileManagement
+package hipafile
 
 import (
 	Cell "entities/cell"
-	File "entities/file"
+	"services/FileManagement"
 	"fmt"
-	"globals"
 	"io"
 	"net/http"
 	"os"
@@ -14,7 +13,7 @@ import (
 func ParseFiles(w http.ResponseWriter, r *http.Request) error {
 
 	// TODO create Folder
-	folderName, err := createDirectory()
+	folderName, err := FileManagement.CreateDirectory()
 
 	if err != nil {
 		return err
@@ -35,8 +34,8 @@ func ParseFiles(w http.ResponseWriter, r *http.Request) error {
 		file, err := files[i].Open()
 
 		var Cells []*Cell.Cell
-		inputFile := File.InputFile{"", "", folderName, 0.0, Cells, 0, 0, 0, 0, 0}
-		globals.InputFiles = append(globals.InputFiles, &inputFile)
+		inputFile := InputFile{"", "", folderName, 0.0, Cells, 0, 0, 0, 0, 0}
+		InputFiles = append(InputFiles, &inputFile)
 
 		inputFile.ResolveName(files[i].Filename)
 
@@ -47,7 +46,7 @@ func ParseFiles(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
-		dst, err := os.Create(globals.WorkingDir + folderName + "/" + inputFile.Name + ".txt")
+		dst, err := os.Create(FileManagement.WorkingDir + folderName + "/" + inputFile.Name + ".txt")
 
 		defer dst.Close()
 

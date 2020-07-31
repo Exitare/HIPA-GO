@@ -2,10 +2,11 @@ package FileManagement
 
 import (
 	"fmt"
-	"globals"
 	"os"
 	"services/Misc"
 )
+
+var WorkingDir = "./data/"
 
 // dirExists returns whether the given file or directory exists
 func dirExists(path string) (bool, error) {
@@ -20,9 +21,9 @@ func dirExists(path string) (bool, error) {
 }
 
 // CreateDirectory creates a new directory
-func createDirectory() (string, error) {
+func CreateDirectory() (string, error) {
 	folderName := Misc.GenerateRandomString(20)
-	exists, err := dirExists(globals.WorkingDir + folderName)
+	exists, err := dirExists(WorkingDir + folderName)
 
 	if err != nil {
 		return "", err
@@ -30,9 +31,9 @@ func createDirectory() (string, error) {
 
 	fmt.Println("Folder exists ", exists)
 	if !exists {
-		os.MkdirAll(globals.WorkingDir+folderName, os.FileMode.Perm(0777))
+		os.MkdirAll(WorkingDir+folderName, os.FileMode.Perm(0777))
 	} else {
-		createDirectory()
+		CreateDirectory()
 	}
 
 	return folderName, err

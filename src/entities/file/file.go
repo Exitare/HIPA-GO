@@ -5,9 +5,12 @@ import (
 	TimeFrame "entities/timeframe"
 	"fmt"
 	"io/ioutil"
+	"services/FileManagement"
 	"strconv"
 	"strings"
 )
+
+var InputFiles []*InputFile
 
 //InputFile represents an uploaded file
 type InputFile struct {
@@ -25,7 +28,7 @@ type InputFile struct {
 
 //ReadFile reads the content of a file
 func (inputFile *InputFile) ReadContent() error {
-	content, err := ioutil.ReadFile("temp_data" + inputFile.Foldername + "/" + inputFile.Name + ".txt")
+	content, err := ioutil.ReadFile( FileManagement.WorkingDir + inputFile.Foldername + "/" + inputFile.Name + ".txt")
 	if err != nil {
 		return err
 	}

@@ -1,12 +1,11 @@
-package FileManagement
+package hipafile
 
 import (
 	"fmt"
-	"globals"
 )
 
 func Prepare() error {
-	for _, inputFile := range globals.InputFiles {
+	for _, inputFile := range InputFiles {
 		err := inputFile.ReadContent()
 		if err != nil {
 			return err
