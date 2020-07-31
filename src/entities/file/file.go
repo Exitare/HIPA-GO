@@ -1,12 +1,12 @@
-package entities
+package hipafile
 
 import (
+	Cell "entities/cell"
+	TimeFrame "entities/timeframe"
 	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
-	"entities/cell"
-	"entities/timeframe"
 )
 
 //InputFile represents an uploaded file
@@ -15,7 +15,7 @@ type InputFile struct {
 	Content              string
 	Foldername           string
 	PercentageLimit      float32
-	Cells                []*Cell
+	Cells                []*Cell.Cell
 	CellCount            uint64
 	RowCount             uint64
 	TimeFrameCount       uint64
@@ -24,7 +24,7 @@ type InputFile struct {
 }
 
 //ReadFile reads the content of a file
-func (inputFile *InputFile) readContent() error {
+func (inputFile *InputFile) ReadContent() error {
 	content, err := ioutil.ReadFile("temp_data" + inputFile.Foldername + "/" + inputFile.Name + ".txt")
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (inputFile *InputFile) readContent() error {
 	return nil
 }
 
-func (inputFile *InputFile) resolveName(uploadName string) {
+func (inputFile *InputFile) ResolveName(uploadName string) {
 	uploadName = strings.Join(strings.Fields(uploadName), "")
 	splits := strings.Split(uploadName, ".")
 
@@ -48,11 +48,11 @@ func (inputFile *InputFile) resolveName(uploadName string) {
 	fmt.Println(inputFile.Name)
 }
 
-func (inputFile *InputFile) countTimeFrames() {
+func (inputFile *InputFile) CountTimeFrames() {
 	inputFile.TimeFrameCount = uint64(len(strings.Split(inputFile.Content, "\n"))) - 1
 }
 
-func (inputFile *InputFile) countCells() {
+func (inputFile *InputFile) CountCells() {
 	lines := strings.Split(inputFile.Content, "\n")
 	for line := range lines {
 		strings.Trim(lines[line], " ")
@@ -70,16 +70,16 @@ func (inputFile *InputFile) countCells() {
 	}
 }
 
-func (inputFile *InputFile) createCells() {
-	var timeFrames []*TimeFrame
+func (inputFile *InputFile) CreateCells() {
+	var timeFrames []*TimeFrame.TimeFrame
 	var highIntensityCounts map[float64]int32
 	for i := 0; i < int(inputFile.CellCount); i++ {
-		cell := Cell{"", timeFrames, 0.0, 0.0, timeFrames, 0.0, highIntensityCounts}
+		cell := Cell.Cell{"", timeFrames, 0.0, 0.0, timeFrames, 0.0, highIntensityCounts}
 		inputFile.Cells = append(inputFile.Cells, &cell)
 	}
 }
 
-func (inputFile *InputFile) populateCells() {
+func (inputFile *InputFile) PopulateCells() {
 
 	lines := strings.Split(inputFile.Content, "\n")
 
@@ -91,7 +91,7 @@ func (inputFile *InputFile) populateCells() {
 				inputFile.Cells[cell].Name = cellValueList[cell]
 			} else {
 				if timeframeValue, err := strconv.ParseFloat(cellValueList[cell], 32); err == nil {
-					timeframe := TimeFrame{uint32(line), timeframeValue, (float64(line) * 3.9 / 60), false}
+					timeframe := TimeFrame.TimeFrame{uint32(line), timeframeValue, (float64(line) * 3.9 / 60), false}
 					inputFile.Cells[cell].TimeFrames = append(inputFile.Cells[cell].TimeFrames, &timeframe)
 				}
 			}

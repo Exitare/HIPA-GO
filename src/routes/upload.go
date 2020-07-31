@@ -2,14 +2,14 @@ package routes
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"services/FileManagement"
 )
 
-func uploadFile(w http.ResponseWriter, r *http.Request) {
+func UploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("File Upload Endpoint Hit")
 
-	err := ParseFiles(w, r)
+	err := FileManagement.ParseFiles(w, r)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -17,12 +17,12 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = prepareFiles()
+	err = FileManagement.Prepare()
 	if err != nil {
 		fmt.Println(err.Error())
 		http.Error(w, "Error while processing files", http.StatusInternalServerError)
 		return
 	}
 
-	startCalculations()
+	// startCalculations()
 }

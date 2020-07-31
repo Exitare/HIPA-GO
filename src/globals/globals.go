@@ -1,4 +1,9 @@
 package globals
 
-var inputFiles []*InputFile
-var workingDir = "./data/"
+
+import (
+	File "entities/file"
+)
+
+var InputFiles []*File.InputFile
+var WorkingDir = "./data/"

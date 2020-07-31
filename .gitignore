@@ -2,3 +2,7 @@ hipa
 cell
 .DS_Store
 HIPA-GO
+bin/
+.idea/*
+pkg/
+src/src

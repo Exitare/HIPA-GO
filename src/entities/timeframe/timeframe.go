@@ -1,4 +1,4 @@
-package entities
+package hipatimeframe
 
 //TimeFrame represents a TimeFrame struct
 type TimeFrame struct {
