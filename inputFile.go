@@ -56,7 +56,7 @@ func (inputFile *InputFile) countCells() {
 		strings.Trim(lines[line], " ")
 		fmt.Printf("Line is: %s \n", lines[line])
 		fmt.Printf("Line lengt is %d", len(lines[line]))
-		if len(lines[line]) != 0 || len(lines[line]) != nil {
+		if len(lines[line]) != 0 {
 			values := strings.Split(lines[line], "\t")
 			count := 0
 			for range values {
