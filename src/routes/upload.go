@@ -1,12 +1,12 @@
 package routes
 
 import (
+	File "entities/file"
 	"fmt"
 	"net/http"
-	File "entities/file"
 )
 
-func UploadFile(w http.ResponseWriter, r *http.Request) {
+func UploadRequestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("File Upload Endpoint Hit")
 
 	err := File.ParseFiles(w, r)
@@ -24,5 +24,8 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
+	defer r.Body.Close()
 	// startCalculations()
 }
+

@@ -22,8 +22,9 @@ func main() {
 
 
 func setupRoutes() {
-	http.HandleFunc("/upload/", routes.UploadFile)
+	http.HandleFunc("/upload/", routes.UploadRequestHandler)
 	http.HandleFunc("/", routes.ServeMainPage)
+	http.HandleFunc("/download", routes.DownloadRequestHandler)
 	http.ListenAndServe(":8080", nil)
 }
 
